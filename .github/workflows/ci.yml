@@ -36,7 +36,7 @@ jobs:
       - name: Install bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 'latest'
+          cache: false
 
       - name: Install frontend dependencies
         run: bun install
