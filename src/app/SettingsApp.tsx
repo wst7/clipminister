@@ -1,7 +1,17 @@
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { RefreshCw } from "lucide-react";
+
+interface UpdateInfo {
+  has_update: boolean;
+  current_version: string;
+  latest_version: string;
+  download_url: string;
+  release_notes: string | null;
+}
 
 interface Settings {
   language: string;
@@ -18,6 +28,8 @@ export function SettingsApp() {
     maxItems: 20,
   });
   const [loading, setLoading] = useState(true);
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
 
   const applyTheme = (theme: string) => {
     const isDark =
@@ -89,6 +101,24 @@ export function SettingsApp() {
 
   const handleMaxItemsChange = (maxItems: number) => {
     saveSettings({ ...settings, maxItems });
+  };
+
+  const checkForUpdate = async () => {
+    setCheckingUpdate(true);
+    try {
+      const info = await invoke<UpdateInfo>("check_update");
+      setUpdateInfo(info);
+    } catch (error) {
+      console.error("检查更新失败:", error);
+    } finally {
+      setCheckingUpdate(false);
+    }
+  };
+
+  const handleUpdate = () => {
+    if (updateInfo?.download_url) {
+      openUrl(updateInfo.download_url);
+    }
   };
 
   return (
@@ -163,6 +193,49 @@ export function SettingsApp() {
               onChange={(e) => handleMaxItemsChange(Math.max(1, Math.min(500, parseInt(e.target.value) || 20)))}
               className="w-40 px-3 py-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
+          )}
+        </section>
+
+        <section>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-medium">检查更新</h3>
+          </div>
+          {!updateInfo ? (
+            <button
+              onClick={checkForUpdate}
+              disabled={checkingUpdate}
+              className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 text-sm"
+            >
+              <RefreshCw className={`w-4 h-4 ${checkingUpdate ? "animate-spin" : ""}`} />
+              {checkingUpdate ? "检查中..." : "检查更新"}
+            </button>
+          ) : (
+            <div className="space-y-2">
+              <div className="text-sm">
+                当前版本: <span className="font-medium">{updateInfo.current_version}</span>
+              </div>
+              {updateInfo.has_update ? (
+                <>
+                  <div className="text-sm text-green-600">
+                    发现新版本: <span className="font-medium">{updateInfo.latest_version}</span>
+                  </div>
+                  <button
+                    onClick={handleUpdate}
+                    className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-sm"
+                  >
+                    下载更新
+                  </button>
+                </>
+              ) : (
+                <div className="text-sm text-muted-foreground">已是最新版本</div>
+              )}
+              <button
+                onClick={() => setUpdateInfo(null)}
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                重新检查
+              </button>
+            </div>
           )}
         </section>
       </div>

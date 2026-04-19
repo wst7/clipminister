@@ -32,5 +32,6 @@ dirs = "5"
 uuid = { version = "1", features = ["v4", "serde"] }
 arboard = "3.6.1"
 tray-icon = "0.22.0"
+reqwest = { version = "0.12", features = ["json"] }
 
 

@@ -1,5 +1,13 @@
 use crate::models::{AppState, ClipboardItem, Settings};
 use crate::storage;
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+struct GitHubRelease {
+    tag_name: String,
+    html_url: String,
+    body: Option<String>,
+}
 
 #[tauri::command]
 pub fn get_clipboard_items(state: tauri::State<AppState>) -> Result<Vec<ClipboardItem>, String> {
@@ -163,4 +171,59 @@ pub fn get_history_items(state: tauri::State<AppState>) -> Result<Vec<ClipboardI
         }
     });
     Ok(sorted_items.into_iter().take(max_items).collect())
+}
+
+#[derive(serde::Serialize)]
+pub struct UpdateInfo {
+    pub has_update: bool,
+    pub current_version: String,
+    pub latest_version: String,
+    pub download_url: String,
+    pub release_notes: Option<String>,
+}
+
+#[tauri::command]
+pub async fn check_update() -> Result<UpdateInfo, String> {
+    let current_version = env!("CARGO_PKG_VERSION").to_string();
+
+    let client = reqwest::Client::new();
+    let response = client
+        .get("https://api.github.com/repos/wstreet7/clipon/releases/latest")
+        .header("User-Agent", "ClipMinister")
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if !response.status().is_success() {
+        return Err("Failed to fetch release info".to_string());
+    }
+
+    let release: GitHubRelease = response.json().await.map_err(|e| e.to_string())?;
+
+    let latest_version = release.tag_name.trim_start_matches('v').to_string();
+
+    let has_update = compare_versions(&current_version, &latest_version) == std::cmp::Ordering::Less;
+
+    Ok(UpdateInfo {
+        has_update,
+        current_version,
+        latest_version,
+        download_url: release.html_url,
+        release_notes: release.body,
+    })
+}
+
+fn compare_versions(current: &str, latest: &str) -> std::cmp::Ordering {
+    let current_parts: Vec<u32> = current.split('.').filter_map(|s| s.parse().ok()).collect();
+    let latest_parts: Vec<u32> = latest.split('.').filter_map(|s| s.parse().ok()).collect();
+
+    for i in 0..std::cmp::max(current_parts.len(), latest_parts.len()) {
+        let cur = current_parts.get(i).unwrap_or(&0);
+        let lat = latest_parts.get(i).unwrap_or(&0);
+        match cur.cmp(lat) {
+            std::cmp::Ordering::Equal => continue,
+            other => return other,
+        }
+    }
+    std::cmp::Ordering::Equal
 }
