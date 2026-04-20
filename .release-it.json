@@ -87,7 +87,8 @@
   },
   "hooks": {
     "after:bump": [
-      "git add src-tauri/Cargo.lock"
+      "cd src-tauri && cargo check >/dev/null 2>&1",
+      "git add -A src-tauri/Cargo.lock"
     ],
     "after:release": "echo Successfully released v${version}."
   }
