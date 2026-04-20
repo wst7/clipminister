@@ -50,9 +50,6 @@ jobs:
       - name: Install frontend dependencies
         run: bun install
 
-      - name: Build frontend
-        run: bun run build
-
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:

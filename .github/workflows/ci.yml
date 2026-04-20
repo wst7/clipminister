@@ -49,8 +49,6 @@ jobs:
       - name: Check TypeScript
         run: bun run tsc --noEmit
 
-      - name: Build frontend
-        run: bun run build
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
