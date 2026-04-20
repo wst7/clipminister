@@ -84,5 +84,11 @@
       },
       "infile": "CHANGELOG.md"
     }
+  },
+  "hooks": {
+    "before:commit": [
+      "git add src-tauri/Cargo.lock"
+    ],
+    "after:release": "echo Successfully released v${version}."
   }
 }
