@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.0](https://github.com/wst7/clipon/compare/v1.1.0...v1.2.0) (2026-04-21)
+
+### ✨ Features | 新功能
+
+* tray menu support i18n ([38d577c](https://github.com/wst7/clipon/commit/38d577c35855e505655073849062476f9264efef))
+
 ## [1.1.0](https://github.com/wst7/clipon/compare/v1.0.6...v1.1.0) (2026-04-21)
 
 ### ✨ Features | 新功能
