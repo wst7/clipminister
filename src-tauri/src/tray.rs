@@ -16,7 +16,7 @@ pub fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
             "../icons/tray/16x16.png"
         ))?)
         .menu(&menu)
-        .tooltip("ClipOn - 剪贴板管理")
+        .tooltip("ClipOn")
         .show_menu_on_left_click(true)
         .on_tray_icon_event(|tray, event| match event {
             TrayIconEvent::Click {

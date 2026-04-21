@@ -23,13 +23,13 @@ export function SearchBar({
 
   return (
     <div className="relative w-full max-w-2xl mx-auto">
-      <Search size={ICON_SIZE} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10" />
+      <Search size={ICON_SIZE} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground z-10" />
       <Input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="pl-9 pr-10 h-10 rounded-xl bg-background border border-input text-sm shadow-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        className="pl-8 pr-9 h-8 rounded-xl bg-background border border-input text-sm shadow-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       />
       {value && (
         <button

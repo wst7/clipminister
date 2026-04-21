@@ -15,7 +15,7 @@
         "label": "main",
         "title": "ClipOn",
         "width": 550,
-        "height": 350,
+        "height": 550,
         "minWidth": 450,
         "minHeight": 300,
         "resizable": true,

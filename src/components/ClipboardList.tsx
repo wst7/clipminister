@@ -5,7 +5,6 @@ import { Clipboard } from "lucide-react";
 interface ClipboardListProps {
   pinnedItems: ClipboardItem[];
   unpinnedItems: ClipboardItem[];
-  compact?: boolean;
   onCopy: (content: string) => void;
   onDelete: (id: string) => void;
   onTogglePin: (id: string) => void;
@@ -14,7 +13,6 @@ interface ClipboardListProps {
 export function ClipboardList({
   pinnedItems,
   unpinnedItems,
-  compact = false,
   onCopy,
   onDelete,
   onTogglePin,
@@ -39,15 +37,11 @@ export function ClipboardList({
     <div className="flex-1 overflow-y-auto p-4">
       {hasPinned && (
         <section className="mb-4">
-          {!compact && (
-            <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wide px-1 mb-2">置顶</h3>
-          )}
           <div className="flex flex-col gap-2">
             {pinnedItems.map((item) => (
               <ClipboardItemCard
                 key={item.id}
                 item={item}
-                compact={compact}
                 onCopy={onCopy}
                 onDelete={onDelete}
                 onTogglePin={onTogglePin}
@@ -59,15 +53,11 @@ export function ClipboardList({
 
       {hasUnpinned && (
         <section>
-          {hasPinned && !compact && (
-            <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wide px-1 mb-2">最近</h3>
-          )}
           <div className="flex flex-col gap-2">
             {unpinnedItems.map((item) => (
               <ClipboardItemCard
                 key={item.id}
                 item={item}
-                compact={compact}
                 onCopy={onCopy}
                 onDelete={onDelete}
                 onTogglePin={onTogglePin}

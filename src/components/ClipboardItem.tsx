@@ -5,13 +5,8 @@ import type { ClipboardItem } from "@/types/clipboard";
 
 const ICON_SIZE = 14;
 
-function truncate(text: string, len: number): string {
-  return text.length > len ? text.slice(0, len) + "..." : text;
-}
-
 interface ClipboardItemCardProps {
   item: ClipboardItem;
-  compact?: boolean;
   onCopy: (content: string) => Promise<boolean | void> | boolean | void;
   onDelete: (id: string) => void;
   onTogglePin: (id: string) => void;
@@ -19,7 +14,6 @@ interface ClipboardItemCardProps {
 
 export function ClipboardItemCard({
   item,
-  compact = false,
   onCopy,
   onDelete,
   onTogglePin,
@@ -45,20 +39,18 @@ export function ClipboardItemCard({
 
   return (
     <div
-      className={`group flex items-start gap-3 p-3 rounded-xl bg-card border border-border hover:border-ring hover:shadow-md transition-all cursor-pointer ${item.isPinned ? "ring-2 ring-primary/20" : ""}`}
+      className={`group flex items-center gap-2 p-2 rounded-xl bg-card border hover:shadow-md transition-all cursor-pointer ${item.isPinned ? "border-amber-400 bg-amber-50/50 dark:bg-amber-950/20" : "border-border hover:border-ring"}`}
       onClick={handleCopy}
       role="button"
       aria-label={t('copy')}
     >
       {item.isPinned && (
-        <span className="self-start mt-1.5 size-1.5 rounded-full bg-amber-500 flex-shrink-0" />
+        <Pin size={12} className="text-amber-500 flex-shrink-0" />
       )}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1 mb-1">
-          {item.isPinned && <span className="px-2 py-0.5 text-xs rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">{t('pinned')}</span>}
-        </div>
-        <div className="text-sm leading-tight line-clamp-2" title={item.content}>
-          {compact ? truncate(item.content, 50) : truncate(item.content, 120)}
+        
+        <div className="text-sm leading-tight truncate overflow-hidden whitespace-nowrap" title={item.content}>
+          {item.content}
         </div>
       </div>
 

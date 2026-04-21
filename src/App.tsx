@@ -1,7 +1,7 @@
-import { MainApp } from "./app/MainApp";
+import Preferences from "@/pages/Preferences";
 
 function App() {
-  return <MainApp />;
+  return <Preferences />;
 }
 
 export default App;

@@ -38,7 +38,7 @@ const themes = [
   { id: "dark", name: "Dark" },
 ];
 
-export function MainApp() {
+export default function MainApp() {
   const { t, i18n } = useTranslation();
   const { displayedPinned, displayedUnpinned, isLoading, search, setSearch, copyToClipboard, deleteItem, togglePin } = useClipboard();
 
@@ -167,9 +167,6 @@ export function MainApp() {
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(String(key))}
           className="px-4"
-          classNames={{
-            tab: "text-foreground",
-          }}
         >
           <Tabs.ListContainer>
             <Tabs.List aria-label="Navigation">
