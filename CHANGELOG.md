@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.4.0](https://github.com/wst7/clipon/compare/v1.3.0...v1.4.0) (2026-04-21)
+
+### ✨ Features | 新功能
+
+* add core:window:allow-set-theme permission ([b22cafa](https://github.com/wst7/clipon/commit/b22cafa54f1fd91c074c3706f3452431800a140d))
+
+### 🐛 Bug Fixes | Bug 修复
+
+* adapt title bar symbol color to theme on macOS ([df5bc08](https://github.com/wst7/clipon/commit/df5bc08db95bb7b59082754022be4158013a104a))
+* add padding top for overlay title bar to avoid overlap ([d9f6e59](https://github.com/wst7/clipon/commit/d9f6e597d3342f90f828db5f6a239f1eafdcf60f))
+* also update window theme when system theme changes ([e7ac50e](https://github.com/wst7/clipon/commit/e7ac50e11f0c9dd2ce123e599c91524fc9f21ab7))
+* apply system theme on initialization for title bar ([d545f8e](https://github.com/wst7/clipon/commit/d545f8ebcaf2507a63252f181cb213cf5f14a6d9))
+* ensure tab text color is correct in dark mode ([e898bc5](https://github.com/wst7/clipon/commit/e898bc57aa67c24d58205a229f4f7abc4e7f5408))
+* improve search placeholder visibility in light theme ([627c254](https://github.com/wst7/clipon/commit/627c25457cf950256d7dcae719ad1266755dfe39))
+* match correct architecture for macOS dmg download ([2b98982](https://github.com/wst7/clipon/commit/2b989829a7732371f569fe35a984fca188c27aea))
+* prefer x64 dmg on macOS to avoid quarantine damage error ([f7987a0](https://github.com/wst7/clipon/commit/f7987a091951407425f29e5216cff0688b721cad))
+* re-apply theme when settings.theme changes (fixes system theme switch) ([216a9de](https://github.com/wst7/clipon/commit/216a9de0d5b6335373eac64fd0668fe161252f8d))
+* remove border bottom from tabs header ([e3ee44c](https://github.com/wst7/clipon/commit/e3ee44c5e285d2671699144f7ba954b3497d2e65))
+* theme change updates window title bar color ([b186a94](https://github.com/wst7/clipon/commit/b186a94ec0d2fae907fd3e286995e65510da6eef))
+
 ## [1.3.0](https://github.com/wst7/clipon/compare/v1.2.0...v1.3.0) (2026-04-21)
 
 ### ✨ Features | 新功能
