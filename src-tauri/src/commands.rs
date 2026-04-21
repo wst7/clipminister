@@ -1,12 +1,22 @@
 use crate::models::{AppState, ClipboardItem, Settings};
 use crate::storage;
 use serde::Deserialize;
+use std::io::Write;
+use tauri::AppHandle;
+use tauri::Emitter;
 
 #[derive(Deserialize)]
 struct GitHubRelease {
     tag_name: String,
     html_url: String,
     body: Option<String>,
+    assets: Vec<GitHubAsset>,
+}
+
+#[derive(Deserialize)]
+struct GitHubAsset {
+    name: String,
+    browser_download_url: String,
 }
 
 #[tauri::command]
@@ -188,6 +198,13 @@ pub struct UpdateInfo {
     pub release_notes: Option<String>,
 }
 
+#[derive(serde::Serialize, Clone)]
+pub struct DownloadProgress {
+    pub downloaded: u64,
+    pub total: u64,
+    pub percent: f32,
+}
+
 #[tauri::command]
 pub async fn check_update() -> Result<UpdateInfo, String> {
     let current_version = env!("CARGO_PKG_VERSION").to_string();
@@ -242,4 +259,70 @@ fn compare_versions(current: &str, latest: &str) -> std::cmp::Ordering {
         }
     }
     std::cmp::Ordering::Equal
+}
+
+fn find_asset_for_platform(release: &GitHubRelease) -> Option<&GitHubAsset> {
+    let os = std::env::consts::OS;
+
+    release.assets.iter().find(|asset| {
+        match os {
+            "macos" => asset.name.ends_with(".dmg"),
+            "windows" => asset.name.ends_with(".exe") || asset.name.ends_with(".msi"),
+            "linux" => asset.name.ends_with(".AppImage") || asset.name.ends_with(".deb"),
+            _ => false,
+        }
+    })
+}
+
+#[tauri::command]
+pub async fn start_download_update(app_handle: AppHandle) -> Result<String, String> {
+    let client = reqwest::Client::new();
+    let response = client
+        .get("https://api.github.com/repos/wst7/clipon/releases/latest")
+        .header("User-Agent", "ClipOn")
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if !response.status().is_success() {
+        return Err("Failed to fetch release info".to_string());
+    }
+
+    let release: GitHubRelease = response.json().await.map_err(|e| e.to_string())?;
+
+    let asset = find_asset_for_platform(&release)
+        .ok_or_else(|| "No installer found for your platform".to_string())?;
+
+    let download_response = client
+        .get(&asset.browser_download_url)
+        .header("User-Agent", "ClipOn")
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    let total_size = download_response.content_length().unwrap_or(0);
+
+    let temp_path = std::env::temp_dir().join(&asset.name);
+    let mut file = std::fs::File::create(&temp_path).map_err(|e| e.to_string())?;
+
+    // Use bytes() for simpler implementation - it loads all bytes into memory
+    // For large files, we would need to use streaming with proper error types
+    let bytes = download_response.bytes().await.map_err(|e| e.to_string())?;
+    file.write_all(&bytes).map_err(|e| e.to_string())?;
+    let downloaded = bytes.len() as u64;
+
+    // Emit final progress event
+    app_handle.emit("download_progress", DownloadProgress {
+        downloaded,
+        total: total_size,
+        percent: 100.0,
+    }).map_err(|e| e.to_string())?;
+
+    Ok(temp_path.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+pub fn open_installer(path: String) -> Result<(), String> {
+    open::that(&path).map_err(|e| e.to_string())?;
+    Ok(())
 }
