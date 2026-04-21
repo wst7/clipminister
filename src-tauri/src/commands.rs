@@ -301,22 +301,30 @@ pub async fn start_download_update(app_handle: AppHandle) -> Result<String, Stri
         .map_err(|e| e.to_string())?;
 
     let total_size = download_response.content_length().unwrap_or(0);
+    let mut downloaded = 0u64;
+    let mut stream = download_response.bytes_stream();
 
     let temp_path = std::env::temp_dir().join(&asset.name);
     let mut file = std::fs::File::create(&temp_path).map_err(|e| e.to_string())?;
 
-    // Use bytes() for simpler implementation - it loads all bytes into memory
-    // For large files, we would need to use streaming with proper error types
-    let bytes = download_response.bytes().await.map_err(|e| e.to_string())?;
-    file.write_all(&bytes).map_err(|e| e.to_string())?;
-    let downloaded = bytes.len() as u64;
+    use futures_util::StreamExt;
+    while let Some(chunk) = stream.next().await {
+        let chunk = chunk.map_err(|e| e.to_string())?;
+        file.write_all(&chunk).map_err(|e| e.to_string())?;
+        downloaded += chunk.len() as u64;
 
-    // Emit final progress event
-    app_handle.emit("download_progress", DownloadProgress {
-        downloaded,
-        total: total_size,
-        percent: 100.0,
-    }).map_err(|e| e.to_string())?;
+        let percent = if total_size > 0 {
+            (downloaded as f32 / total_size as f32) * 100.0
+        } else {
+            0.0
+        };
+
+        app_handle.emit("download_progress", DownloadProgress {
+            downloaded,
+            total: total_size,
+            percent,
+        }).map_err(|e| e.to_string())?;
+    }
 
     Ok(temp_path.to_string_lossy().to_string())
 }
