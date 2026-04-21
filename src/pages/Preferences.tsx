@@ -87,6 +87,11 @@ export default function MainApp() {
     }
   };
 
+  // 当主题设置改变时，重新应用主题
+  useEffect(() => {
+    applyTheme(settings.theme);
+  }, [settings.theme]);
+
   useEffect(() => {
     loadSettings();
   }, []);
@@ -94,26 +99,10 @@ export default function MainApp() {
   useEffect(() => {
     if (settings.theme === "system") {
       const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      const currentWindow = getCurrentWindow();
-      const handler = (e: MediaQueryListEvent) => {
-        if (e.matches) {
-          document.documentElement.classList.add("dark");
-          document.documentElement.classList.remove("light");
-          document.documentElement.setAttribute("data-theme", "dark");
-          if (typeof currentWindow.setTheme === 'function') {
-            currentWindow.setTheme('dark');
-          }
-        } else {
-          document.documentElement.classList.remove("dark");
-          document.documentElement.classList.add("light");
-          document.documentElement.setAttribute("data-theme", "light");
-          if (typeof currentWindow.setTheme === 'function') {
-            currentWindow.setTheme('light');
-          }
-        }
+      // 系统主题变化时，重新应用主题（applyTheme 会重新读取系统状态）
+      const handler = () => {
+        applyTheme(settings.theme);
       };
-      // 初始化时立即应用当前系统主题
-      handler({ matches: mediaQuery.matches } as MediaQueryListEvent);
       mediaQuery.addEventListener("change", handler);
       return () => mediaQuery.removeEventListener("change", handler);
     }
