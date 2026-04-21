@@ -112,6 +112,8 @@ export default function MainApp() {
           }
         }
       };
+      // 初始化时立即应用当前系统主题
+      handler({ matches: mediaQuery.matches } as MediaQueryListEvent);
       mediaQuery.addEventListener("change", handler);
       return () => mediaQuery.removeEventListener("change", handler);
     }
