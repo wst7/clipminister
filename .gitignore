@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 # heroui-agents-md
 .heroui-docs/
+
+# Git worktrees
+.worktrees
