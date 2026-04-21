@@ -94,11 +94,22 @@ export default function MainApp() {
   useEffect(() => {
     if (settings.theme === "system") {
       const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      const currentWindow = getCurrentWindow();
       const handler = (e: MediaQueryListEvent) => {
         if (e.matches) {
           document.documentElement.classList.add("dark");
+          document.documentElement.classList.remove("light");
+          document.documentElement.setAttribute("data-theme", "dark");
+          if (typeof currentWindow.setTheme === 'function') {
+            currentWindow.setTheme('dark');
+          }
         } else {
           document.documentElement.classList.remove("dark");
+          document.documentElement.classList.add("light");
+          document.documentElement.setAttribute("data-theme", "light");
+          if (typeof currentWindow.setTheme === 'function') {
+            currentWindow.setTheme('light');
+          }
         }
       };
       mediaQuery.addEventListener("change", handler);
