@@ -41,7 +41,6 @@ const languages = [
 ];
 
 const themes = (t: (key: string) => string) => [
-  { id: "system", name: t("system") },
   { id: "light", name: t("light") },
   { id: "dark", name: t("dark") },
 ];
@@ -96,28 +95,16 @@ export default function MainApp() {
     loadSettings();
   }, []);
 
-  useEffect(() => {
-    if (settings.theme === "system") {
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-      // 系统主题变化时，重新应用主题（applyTheme 会重新读取系统状态）
-      const handler = () => {
-        applyTheme(settings.theme);
-      };
-      mediaQuery.addEventListener("change", handler);
-      return () => mediaQuery.removeEventListener("change", handler);
-    }
-  }, [settings.theme]);
-
   const loadSettings = async () => {
     try {
       const data = await invoke<SettingsData>("get_settings");
       setSettings({
         language: data.language || "zh",
-        theme: data.theme || "system",
+        theme: data.theme || "light",
         autostart: data.autostart ?? false,
         max_items: data.max_items ?? 20,
       });
-      applyTheme(data.theme || "system");
+      applyTheme(data.theme || "light");
       if (data.language) {
         i18n.changeLanguage(data.language === "zh" ? "zh" : "en");
       }
