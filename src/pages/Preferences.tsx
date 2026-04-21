@@ -203,8 +203,8 @@ export default function MainApp() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      {/* 顶部 Tabs 导航 */}
-      <div className="sticky top-0 z-20 border-b border-border bg-background">
+      {/* 顶部 Tabs 导航 - 留出标题栏空间 (Overlay title bar) */}
+      <div className="sticky top-0 z-20 border-b border-border bg-background pt-[38px]">
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(String(key))}
