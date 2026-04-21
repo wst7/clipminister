@@ -9,7 +9,7 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import { SearchBar } from "@/components/SearchBar";
 import { ClipboardList } from "@/components/ClipboardList";
 import { useClipboard } from "@/hooks/useClipboard";
-import { Tabs, Label, ListBox, Select, Switch } from "@heroui/react";
+import { Tabs, Label, ListBox, Select, Switch, Button, Spinner } from "@heroui/react";
 import { ClipboardList as ClipboardListIcon, Settings, Info, RefreshCw } from "lucide-react";
 
 interface UpdateInfo {
@@ -142,6 +142,7 @@ export default function MainApp() {
     setCheckingUpdate(true);
     try {
       const info = await invoke<UpdateInfo>("check_update");
+      console.log(info)
       setUpdateInfo(info);
     } catch (error) {
       console.error("Failed to check update:", error);
@@ -322,14 +323,15 @@ export default function MainApp() {
               <div className="bg-card rounded-xl p-4 shadow-sm border border-border">
                 <h3 className="font-medium mb-3">{t('checkUpdate')}</h3>
                 {!updateInfo ? (
-                  <button
-                    onClick={checkForUpdate}
-                    disabled={checkingUpdate}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 text-sm w-full justify-center transition-colors"
+                  <Button
+                    onPress={checkForUpdate}
+                    isDisabled={checkingUpdate}
+                    variant="primary"
+                    className="w-full"
                   >
-                    <RefreshCw className={`w-4 h-4 ${checkingUpdate ? "animate-spin" : ""}`} />
+                    {checkingUpdate ? <Spinner size="sm" /> : <RefreshCw className={`w-4 h-4 ${checkingUpdate ? "animate-spin" : ""}`} />}
                     {checkingUpdate ? t('checking') : t('checkUpdate')}
-                  </button>
+                  </Button>
                 ) : (
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
@@ -342,29 +344,31 @@ export default function MainApp() {
                           <span className="text-sm text-green-500">{t('newVersion')}</span>
                           <span className="font-medium text-green-500">{updateInfo.latest_version}</span>
                         </div>
-                        <button
-                          onClick={handleUpdate}
-                          className="w-full px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-sm transition-colors"
+                        <Button
+                          onPress={handleUpdate}
+                          variant="primary"
+                          className="w-full"
                         >
                           {t('download')}
-                        </button>
+                        </Button>
                       </>
                     ) : (
                       <div className="text-center text-sm text-muted-foreground py-2">{t('upToDate')}</div>
                     )}
-                    <button
-                      onClick={() => setUpdateInfo(null)}
-                      className="w-full text-sm text-muted-foreground hover:text-foreground py-1 transition-colors"
+                    <Button
+                      variant="ghost"
+                      onPress={() => setUpdateInfo(null)}
+                      className="w-full"
                     >
                       {t('recheck')}
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
 
               {/* 版权 */}
               <div className="text-center text-xs text-muted-foreground pt-4">
-                <p>© 2025 ClipOn. All rights reserved.</p>
+                <p>© 2026 ClipOn. All rights reserved.</p>
               </div>
             </div>
           </div>
